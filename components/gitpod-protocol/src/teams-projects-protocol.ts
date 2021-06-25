@@ -13,6 +13,7 @@ export interface Project {
     cloneUrl: string;
     teamId: string;
     appInstallationId: string;
+    config?: string;
     creationTime: string;
     /** This is a flag that triggers the HARD DELETION of this entity */
     deleted?: boolean;

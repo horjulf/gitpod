@@ -294,6 +294,8 @@ export namespace GitpodServer {
     }
     export interface CreateWorkspaceOptions {
         contextUrl: string;
+        branch?: string;
+        projectId?: string;
         mode?: CreateWorkspaceMode;
         forceDefaultConfig?: boolean;
     }

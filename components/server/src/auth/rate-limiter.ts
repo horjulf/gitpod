@@ -125,9 +125,6 @@ function readConfig(): RateLimiterConfig {
 
         accesHeadlessLogs: { group: "default", points: 1 },
 
-        /**
-         * gitpod.io concerns
-         */
         "adminAddStudentEmailDomain":  { group: "default", points: 1 },
         "adminGetAccountStatement":  { group: "default", points: 1 },
         "adminIsStudent":  { group: "default", points: 1 },
@@ -163,6 +160,7 @@ function readConfig(): RateLimiterConfig {
         "createProject":  { group: "default", points: 1 },
         "getProjects":  { group: "default", points: 1 },
         "getPrebuilds":  { group: "default", points: 1 },
+        "getProjectOverview":  { group: "default", points: 1 },
 
         "trackEvent":  { group: "default", points: 1 },
     };

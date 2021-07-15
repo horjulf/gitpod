@@ -1007,6 +1007,14 @@ export interface Repository {
         parent: Repository
     }
 }
+export interface Branch {
+    name: string;
+    author: string;
+    sha: string;
+    commitMessage: string;
+    authorAvatarUrl?: string;
+    authorDate?: string;
+}
 
 export namespace Repository {
     export function fullRepoName(repo: Repository): string {

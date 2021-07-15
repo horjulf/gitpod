@@ -7,7 +7,7 @@
 import { injectable, inject } from "inversify";
 import { GitpodServerImpl } from "../../../src/workspace/gitpod-server-impl";
 import { TraceContext } from "@gitpod/gitpod-protocol/lib/util/tracing";
-import { GitpodServer, GitpodClient, AdminGetListRequest, User, AdminGetListResult, Permission, AdminBlockUserRequest, AdminModifyRoleOrPermissionRequest, RoleOrPermission, AdminModifyPermanentWorkspaceFeatureFlagRequest, UserFeatureSettings, AdminGetWorkspacesRequest, WorkspaceAndInstance, GetWorkspaceTimeoutResult, WorkspaceTimeoutDuration, WorkspaceTimeoutValues, SetWorkspaceTimeoutResult, WorkspaceContext, CreateWorkspaceMode, WorkspaceCreationResult, PrebuiltWorkspaceContext, CommitContext, PrebuiltWorkspace, PermissionName, WorkspaceInstance, EduEmailDomain, ProviderRepository, PrebuildInfo, Queue } from "@gitpod/gitpod-protocol";
+import { GitpodServer, GitpodClient, AdminGetListRequest, User, AdminGetListResult, Permission, AdminBlockUserRequest, AdminModifyRoleOrPermissionRequest, RoleOrPermission, AdminModifyPermanentWorkspaceFeatureFlagRequest, UserFeatureSettings, AdminGetWorkspacesRequest, WorkspaceAndInstance, GetWorkspaceTimeoutResult, WorkspaceTimeoutDuration, WorkspaceTimeoutValues, SetWorkspaceTimeoutResult, WorkspaceContext, CreateWorkspaceMode, WorkspaceCreationResult, PrebuiltWorkspaceContext, CommitContext, PrebuiltWorkspace, PermissionName, WorkspaceInstance, EduEmailDomain, ProviderRepository, Queue } from "@gitpod/gitpod-protocol";
 import { ResponseError } from "vscode-jsonrpc";
 import { TakeSnapshotRequest, AdmissionLevel, ControlAdmissionRequest, StopWorkspacePolicy, DescribeWorkspaceRequest, SetTimeoutRequest } from "@gitpod/ws-manager/lib";
 import { ErrorCodes } from "@gitpod/gitpod-protocol/lib/messaging/error";
@@ -1453,31 +1453,6 @@ export class GitpodServerEEImpl extends GitpodServerImpl<GitpodClient, GitpodSer
 
         const repositories = await this.githubAppSupport.getProviderRepositoriesForUser({ user, ...params });
         return repositories;
-    }
-
-    public async getPrebuilds(teamId: string, projectName: string): Promise<PrebuildInfo[]> {
-        this.checkAndBlockUser("getPrebuilds");
-        const result: PrebuildInfo[] = [];
-
-        const project = (await this.projectDB.findProjectsByTeam(teamId)).find(p => p.name === projectName);
-        if (project) {
-            const pwss = await this.workspaceDb.trace({}).findPrebuiltWorkspacesByProject(project.id);
-
-            for (const pws of pwss) {
-                result.push({
-                    id: pws.id,
-                    startedAt: pws.creationTime,
-                    startedBy: "UNKNOWN",
-                    teamId,
-                    project: projectName,
-                    branch: pws.branch || "unknown",
-                    cloneUrl: pws.cloneURL,
-                    status: pws.state
-                });
-            }
-        }
-
-        return result;
     }
     //
     //#endregion

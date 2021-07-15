@@ -50,6 +50,7 @@ import { WorkspaceStarter } from './workspace-starter';
 import { HeadlessLogUrls } from "@gitpod/gitpod-protocol/lib/headless-workspace-log";
 import { HeadlessLogService } from "./headless-log-service";
 import { InvalidGitpodYMLError } from "./config-provider";
+import { ProjectsService } from "../projects/projects-service";
 
 @injectable()
 export class GitpodServerImpl<Client extends GitpodClient, Server extends GitpodServer> implements GitpodServer, Disposable {
@@ -92,6 +93,8 @@ export class GitpodServerImpl<Client extends GitpodClient, Server extends Gitpod
     @inject(GitTokenScopeGuesser) protected readonly gitTokenScopeGuesser: GitTokenScopeGuesser;
 
     @inject(HeadlessLogService) protected readonly headlessLogService: HeadlessLogService;
+
+    @inject(ProjectsService) protected readonly projectsService: ProjectsService;
 
     /** Id the uniquely identifies this server instance */
     public readonly uuid: string = uuidv4();
@@ -1915,26 +1918,31 @@ export class GitpodServerImpl<Client extends GitpodClient, Server extends Gitpod
         this.checkAndBlockUser("getProviderRepositoriesForUser");
         return [];
     }
-    public async createProject(params: CreateProjectParams): Promise<Project> {
+    async createProject(params: CreateProjectParams): Promise<Project> {
         this.checkUser("createProject");
-        const { name, cloneUrl, teamId, appInstallationId } = params;
         // Anyone who can read a team's information (i.e. any team member) can create a new project.
-        await this.guardTeamOperation(teamId, "get");
-        return this.projectDB.storeProject(Project.create({name, cloneUrl, teamId, appInstallationId}));
+        await this.guardTeamOperation(params.teamId, "get");
+        return this.projectsService.createProject(params);
     }
-    public async getProjects(teamId: string): Promise<ProjectInfo[]> {
+    async getProjects(teamId: string): Promise<ProjectInfo[]> {
         this.checkUser("getProjects");
         await this.guardTeamOperation(teamId, "get");
-        const result: Project[] = [];
-        const toProjectInfo = (p: Project) => ({ ...p });
-        result.push(...(await this.projectDB.findProjectsByTeam(teamId)).map(toProjectInfo));
-        return result;
+
+        return this.projectsService.getProjects(teamId);
     }
-    public async getPrebuilds(teamId: string, project: string): Promise<PrebuildInfo[]> {
+    async getPrebuilds(teamId: string, projectName: string): Promise<PrebuildInfo[]> {
         this.checkAndBlockUser("getPrebuilds");
         await this.guardTeamOperation(teamId, "get");
-        return [];
+
+        return this.projectsService.getPrebuilds(teamId, projectName);
     }
+    async getProjectOverview(teamId: string, projectName: string): Promise<Project.Overview | undefined> {
+        const user = this.checkAndBlockUser("getProjectDetails");
+        await this.guardTeamOperation(teamId, "get");
+
+        return this.projectsService.getProjectOverview(user, teamId, projectName);
+    }
+
     //
     //#endregion
 }

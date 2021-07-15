@@ -82,10 +82,25 @@ const gitpodServiceMock = createServiceMock({
     getProjects: async () => {
         return [pr1]
     },
+    getProjectOverview: async () => {
+        return {
+            "main": {
+                name: "main",
+                branchUrl: "branchUrl",
+                changeDate: t1,
+                changeAuthor: u1.fullName!,
+                changeAuthorAvatar: u1.avatarUrl,
+                changeHash: "2C0FFE",
+                changeTitle: "[Comp] Add new functionality for",
+                isDefault: true,
+                status: "available",
+            }
+        }
+    },
     getPrebuilds: async (teamId: string, project: string) => {
         return [{
             id: "pb1",
-            branch: "master",
+            branch: "main",
             branchPrebuildNumber: "123342",
             project,
             teamId,

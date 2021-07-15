@@ -813,13 +813,17 @@ export abstract class AbstractTypeORMWorkspaceDBImpl implements WorkspaceDB {
         return <WorkspaceAndInstance>(res);
     }
 
-    async findPrebuiltWorkspacesByProject(projectId: string): Promise<PrebuiltWorkspace[]> {
+    async findPrebuiltWorkspacesByProject(projectId: string, branch?: string): Promise<PrebuiltWorkspace[]> {
         const repo = await this.getPrebuiltWorkspaceRepo();
 
         const query = repo.createQueryBuilder('pws')
             .orderBy('pws.creationTime', 'ASC')
             .innerJoinAndMapOne('pws.workspace', DBWorkspace, 'ws', 'pws.buildWorkspaceId = ws.id')
-            .andWhere('pws.projectId = :projectId', { projectId })
+            .andWhere('pws.projectId = :projectId', { projectId });
+
+        if (branch) {
+            query.andWhere('pws.branch = :branch', { branch });
+        }
 
         const res = await query.getMany();
         return res;

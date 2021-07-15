@@ -112,5 +112,5 @@ export interface WorkspaceDB {
 
     hardDeleteWorkspace(workspaceID: string): Promise<void>;
 
-    findPrebuiltWorkspacesByProject(projectId: string): Promise<PrebuiltWorkspace[]>;
+    findPrebuiltWorkspacesByProject(projectId: string, branch?: string): Promise<PrebuiltWorkspace[]>;
 }

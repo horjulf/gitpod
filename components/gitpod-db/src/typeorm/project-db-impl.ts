@@ -28,6 +28,11 @@ export class ProjectDBImpl implements ProjectDB {
         return repo.findOne({ cloneUrl });
     }
 
+    public async findProject(teamId: string, projectName: string): Promise<Project | undefined> {
+        const projects = await this.findProjectsByTeam(teamId);
+        return projects.find(p => p.name === projectName);
+    }
+
     async findProjectByInstallationId(appInstallationId: string): Promise<Project | undefined> {
         const repo = await this.getRepo();
         return repo.findOne({ appInstallationId });

@@ -152,7 +152,7 @@ export abstract class AbstractTypeORMWorkspaceDBImpl implements WorkspaceDB {
                     .from(DBWorkspaceInstance, 'i2')
                     .where('i2.phasePersisted = "running"');
             }, 'wsiRunning', 'ws.id = wsiRunning.workspaceId')
-            .where('ws.ownerId = :userId', options)
+            .where('ws.ownerId = :userId', { userId: options.userId })
             .andWhere('ws.softDeleted IS NULL')
             .andWhere('ws.deleted != TRUE')
             .orderBy('wsiRunning.workspaceId', 'DESC')

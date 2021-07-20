@@ -80,7 +80,7 @@ export class ProjectsService {
     }
 
     async createProject({ name, cloneUrl, teamId, appInstallationId }: CreateProjectParams): Promise<Project> {
-        return this.projectDB.createProject(name, cloneUrl, teamId, appInstallationId);
+        return this.projectDB.storeProject(Project.create({ name, cloneUrl, teamId, appInstallationId }));
     }
 
     async getLastPrebuild(project: Project, branch?: string): Promise<PrebuildInfo | undefined> {

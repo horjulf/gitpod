@@ -26,6 +26,28 @@ export namespace Project {
             creationTime: new Date().toISOString()
         };
     }
+
+    export interface Overview {
+        [branch: string]: BranchDetails
+    }
+
+    export interface BranchDetails {
+        name: string;
+        branchUrl: string;
+        isDefault: boolean;
+
+        // PR/MR
+        changeTitle: string;
+        changeDate?: string;
+        changeAuthor?: string;
+        changeAuthorAvatar?: string;
+        changePR?: string;
+        changeUrl?: string;
+        changeHash: string;
+
+        // PREBUILD
+        lastPrebuild?: PrebuildInfo;
+    }
 }
 
 export interface ProjectInfo extends Project {
@@ -38,9 +60,18 @@ export interface PrebuildInfo {
     project: string;
     cloneUrl: string;
     branch: string;
+    branchPrebuildNumber: string;
     startedAt: string;
     startedBy: string;
+    startedByAvatar?: string;
     status: PrebuiltWorkspaceState;
+    changeTitle: string;
+    changeDate: string;
+    changeAuthor: string;
+    changeAuthorAvatar?: string;
+    changePR?: string;
+    changeUrl?: string;
+    changeHash: string;
 }
 
 export interface Team {

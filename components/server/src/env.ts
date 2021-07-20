@@ -14,6 +14,7 @@ import * as fs from "fs";
 import { Branding, NamedWorkspaceFeatureFlag, WorkspaceFeatureFlags } from '@gitpod/gitpod-protocol';
 
 import { BrandingParser } from './branding-parser';
+import { RateLimiterConfig } from './auth/rate-limiter';
 
 @injectable()
 export class Env extends AbstractComponentEnv {
@@ -205,4 +206,6 @@ export class Env extends AbstractComponentEnv {
     readonly runDbDeleter: boolean = getEnvVar('RUN_DB_DELETER', 'false') === 'true';
 
     readonly oauthServerJWTSecret = getEnvVar("OAUTH_SERVER_JWT_SECRET")
+
+    readonly rateLimiter: RateLimiterConfig = JSON.parse(process.env.RATE_LIMITER_CONFIG || "{}");
 }

@@ -21,6 +21,7 @@ import uuid = require('uuid');
 import { accessCodeSyncStorage, UserRateLimiter } from '../auth/rate-limiter';
 import { increaseApiCallUserCounter } from '../prometheus-metrics';
 import { TheiaPluginService } from '../theia-plugin/theia-plugin-service';
+import { Env } from '../env';
 
 // By default: 5 kind of resources * 20 revs * 1Mb = 100Mb max in the content service for user data.
 const defautltRevLimit = 20;
@@ -55,6 +56,9 @@ const userSettingsUri = 'user_storage:settings.json';
 @injectable()
 export class CodeSyncService {
 
+    @inject(Env)
+    private readonly env: Env;
+
     @inject(BearerAuth)
     private readonly auth: BearerAuth;
 
@@ -87,7 +91,7 @@ export class CodeSyncService {
             const id = req.user.id;
             increaseApiCallUserCounter(accessCodeSyncStorage, id);
             try {
-                await UserRateLimiter.instance().consume(id, accessCodeSyncStorage);
+                await UserRateLimiter.instance(this.env.rateLimiter).consume(id, accessCodeSyncStorage);
             } catch (e) {
                 if (e instanceof Error) {
                     throw e;

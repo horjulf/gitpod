@@ -123,7 +123,8 @@ export const productionContainerModule = new ContainerModule((bind, unbind, isBo
     bind(WebsocketConnectionManager).toDynamicValue(ctx => {
             const serverFactory = () => ctx.container.get<GitpodServerImpl<GitpodClient, GitpodServer>>(GitpodServerImpl);
             const hostContextProvider = ctx.container.get<HostContextProvider>(HostContextProvider);
-            return new WebsocketConnectionManager<GitpodClient, GitpodServer>(serverFactory, hostContextProvider);
+            const env = ctx.container.get<Env>(Env);
+            return new WebsocketConnectionManager<GitpodClient, GitpodServer>(serverFactory, hostContextProvider, env.rateLimiter);
         }
     ).inSingletonScope();
 

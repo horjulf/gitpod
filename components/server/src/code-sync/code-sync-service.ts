@@ -27,7 +27,7 @@ import { Env } from '../env';
 const defautltRevLimit = 20;
 // It should keep it aligned with client_max_body_size for /code-sync location.
 const defaultContentLimit = '1Mb';
-const codeSyncConfig: Partial<{
+export type CodeSyncConfig = Partial<{
     revLimit: number
     contentLimit: number
     resources: {
@@ -35,7 +35,7 @@ const codeSyncConfig: Partial<{
             revLimit?: number
         }
     }
-}> = JSON.parse(process.env.CODE_SYNC_CONFIG || "{}");
+}>;
 
 const objectPrefix = 'code-sync/';
 function toObjectName(resource: ServerResource, rev: string): string {
@@ -75,6 +75,7 @@ export class CodeSyncService {
     private readonly userStorageResourcesDB: UserStorageResourcesDB;
 
     get apiRouter(): express.Router {
+        const config = this.env.codeSyncConfig;
         const router = express.Router();
         router.use((_, res, next) => {
             // to correlate errors reported by users with errors logged by the server
@@ -211,7 +212,7 @@ export class CodeSyncService {
             res.send(content);
         });
         router.post('/v1/resource/:resource', bodyParser.text({
-            limit: codeSyncConfig?.contentLimit || defaultContentLimit
+            limit: config?.contentLimit || defaultContentLimit
         }), async (req, res) => {
             if (!User.is(req.user)) {
                 res.sendStatus(204);
@@ -226,7 +227,7 @@ export class CodeSyncService {
             if (latestRev === fromTheiaRev) {
                 latestRev = undefined;
             }
-            const revLimit = resourceKey === 'machines' ? 1 : codeSyncConfig.resources?.[resourceKey]?.revLimit || codeSyncConfig?.revLimit || defautltRevLimit;
+            const revLimit = resourceKey === 'machines' ? 1 : config.resources?.[resourceKey]?.revLimit || config?.revLimit || defautltRevLimit;
             const userId = req.user.id;
             let oldObject: string | undefined;
             const contentType = req.headers['content-type'] || '*/*';
